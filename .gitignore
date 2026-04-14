@@ -1,0 +1,76 @@
+# ============================
+# Secrets & local config — NEVER commit these
+# ============================
+.env
+.env.local
+.env.*.local
+contracts/.env
+backend/.env
+
+# ============================
+# Node.js
+# ============================
+node_modules/
+dist/
+build/
+.npm/
+*.tgz
+
+# ============================
+# TypeScript
+# ============================
+*.js.map
+*.d.ts.map
+
+# ============================
+# macOS
+# ============================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ============================
+# AlgoKit / Algorand
+# ============================
+contracts/projects/contracts/smart_contracts/artifacts/*.teal
+# Keep ARC32/ARC56 spec and client — they are committed
+# Keep TEAL source maps for debugging
+
+# ============================
+# Python (AlgoKit venv)
+# ============================
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ============================
+# Logs
+# ============================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.log
+
+# ============================
+# Editor
+# ============================
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ============================
+# Testing
+# ============================
+coverage/
+.nyc_output/
+
+# ============================
+# MongoDB
+# ============================
+data/db/
