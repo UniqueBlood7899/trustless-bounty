@@ -83,14 +83,14 @@
 
 | REQ-ID | Phase |
 |--------|-------|
+| BOUNTY-02 | 1 |
 | WALLET-01 | 2 |
 | WALLET-02 | 2 |
 | WALLET-03 | 2 |
-| BOUNTY-01 | 1 |
-| BOUNTY-02 | 1 |
-| BOUNTY-03 | 1 |
-| BOUNTY-04 | 1 |
-| BOUNTY-05 | 1 |
+| BOUNTY-01 | 2 |
+| BOUNTY-03 | 2 |
+| BOUNTY-04 | 2 |
+| BOUNTY-05 | 2 |
 | DISCOVER-01 | 2 |
 | DISCOVER-02 | 2 |
 | DISCOVER-03 | 2 |
@@ -101,13 +101,13 @@
 | SUBMIT-04 | 3 |
 | VERIFY-01 | 4 |
 | VERIFY-02 | 4 |
-| VERIFY-03 | 4 |
-| VERIFY-04 | 4 |
-| VERIFY-05 | 4 |
-| PAYOUT-01 | 5 |
-| PAYOUT-02 | 5 |
-| PAYOUT-03 | 5 |
-| PAYOUT-04 | 5 |
-| DASH-01 | 6 |
-| DASH-02 | 6 |
-| DASH-03 | 6 |
+| VERIFY-03 | 5 |
+| VERIFY-04 | 5 |
+| VERIFY-05 | 5 |
+| PAYOUT-01 | 6 |
+| PAYOUT-02 | 6 |
+| PAYOUT-03 | 6 |
+| PAYOUT-04 | 6 |
+| DASH-01 | 7 |
+| DASH-02 | 7 |
+| DASH-03 | 7 |
