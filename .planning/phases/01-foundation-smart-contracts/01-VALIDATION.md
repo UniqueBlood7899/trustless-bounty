@@ -21,7 +21,7 @@ created: 2026-04-14
 | **Config file** | `contracts/projects/contracts/vitest.config.ts`, `backend/jest.config.js` |
 | **Quick run command** | `npm run check-types` |
 | **Full suite command** | `cd backend && npx jest && cd ../contracts/projects/contracts && npx vitest run` |
-| **Estimated runtime** | ~15 seconds |
+| **Estimated runtime** | ~10 seconds |
 
 ---
 
@@ -78,3 +78,11 @@ created: 2026-04-14
 | Gaps found | 3 |
 | Resolved | 3 |
 | Escalated | 0 |
+
+## Validation Audit 2026-04-15
+| Metric | Count |
+|--------|-------|
+| Re-run result | ✅ All green (6/6 tests) |
+| Backend (Jest) | 3 passed |
+| Contracts (Vitest) | 3 passed |
+| Gaps | 0 remaining |
