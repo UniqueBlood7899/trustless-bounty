@@ -76,3 +76,11 @@ export async function fetchSolverSubmissions(solverAddress: string): Promise<{ s
   if (!res.ok) throw new Error(`Failed to fetch submissions: ${res.status}`)
   return res.json()
 }
+
+export type PosterBounty = Bounty & { submissions: Submission[] }
+
+export async function fetchPosterBounties(posterAddress: string): Promise<{ success: boolean; data: PosterBounty[] }> {
+  const res = await fetch(`${API_URL}/api/bounties/my?posterAddress=${encodeURIComponent(posterAddress)}`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(`Failed to fetch your bounties: ${res.status}`)
+  return res.json()
+}

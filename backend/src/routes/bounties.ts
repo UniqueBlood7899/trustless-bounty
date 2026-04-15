@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import Bounty from '../models/Bounty'
+import Submission from '../models/Submission'
 import { deployBountyEscrow } from '../services/algorandService'
 
 const router = Router()
@@ -96,6 +97,30 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   } catch (error) {
     next(error) // passed to global errorHandler middleware
   }
+})
+
+/**
+ * GET /api/bounties/my?posterAddress=XXX
+ * Returns all bounties posted by a wallet address with their submissions embedded.
+ * Must be declared BEFORE /:id to avoid route conflict.
+ */
+router.get('/my', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { posterAddress } = req.query
+    if (!posterAddress || typeof posterAddress !== 'string') {
+      return res.status(400).json({ success: false, error: 'posterAddress query param required' })
+    }
+    const bounties = await Bounty.find({ posterAddress }).sort({ createdAt: -1 }).lean()
+    const bountyIds = bounties.map(b => b._id.toString())
+    const submissions = await Submission.find({ bountyId: { $in: bountyIds } }).sort({ createdAt: -1 }).lean()
+    const subMap: Record<string, typeof submissions> = {}
+    for (const s of submissions) {
+      if (!subMap[s.bountyId]) subMap[s.bountyId] = []
+      subMap[s.bountyId].push(s)
+    }
+    const data = bounties.map(b => ({ ...b, submissions: subMap[b._id.toString()] ?? [] }))
+    return res.json({ success: true, data })
+  } catch (error) { next(error) }
 })
 
 /**

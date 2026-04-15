@@ -5,7 +5,7 @@ import { WalletPill } from './WalletPill'
 
 export function Navbar() {
   const pathname = usePathname()
-  const links = [{ href: '/', label: 'Board' }, { href: '/create', label: 'Post Bounty' }, { href: '/my-submissions', label: 'My Submissions' }]
+  const links = [{ href: '/', label: 'Board' }, { href: '/create', label: 'Post Bounty' }, { href: '/my-bounties', label: 'My Bounties' }, { href: '/my-submissions', label: 'My Submissions' }]
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 h-16 bg-bg-base/80 backdrop-blur-nav border-b border-white/[0.06]">
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">

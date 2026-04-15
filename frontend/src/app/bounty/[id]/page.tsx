@@ -127,7 +127,21 @@ export default function BountyDetailPage({ params }: { params: { id: string } })
             </div>
 
             {/* Submission CTA area */}
-            {!isOpen && <div className="text-center text-text-muted text-sm capitalize">Bounty {b.status}</div>}
+            {!isOpen && b.status === 'won' && (
+              <div className="text-center space-y-3">
+                <div className="py-2 px-4 bg-algo-teal/10 border border-algo-teal/30 rounded-btn">
+                  <p className="text-algo-teal font-bold text-sm">⬡ Bounty Won!</p>
+                  <p className="text-text-muted text-xs mt-0.5">ALGO has been paid to the winner.</p>
+                </div>
+                {b.payoutTxId && (
+                  <a href={explorerTxUrl(b.payoutTxId)} target="_blank" rel="noopener noreferrer"
+                    className="block text-algo-teal text-xs hover:underline">
+                    Payout Tx: {b.payoutTxId.slice(0, 12)}… ↗
+                  </a>
+                )}
+              </div>
+            )}
+            {!isOpen && b.status !== 'won' && <div className="text-center text-text-muted text-sm capitalize">Bounty {b.status}</div>}
             {isOpen && isSelfBounty && <div className="text-center text-text-muted text-sm py-2">This is your bounty</div>}
             {isOpen && !isSelfBounty && (
               <>
