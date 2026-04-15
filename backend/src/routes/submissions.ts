@@ -1,8 +1,52 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import Bounty from '../models/Bounty'
 import Submission from '../models/Submission'
+import { verificationService } from '../services/verificationService'
 
 const router = Router({ mergeParams: true })
+
+/**
+ * Async verification + first-approved-wins logic.
+ * Called after submission is saved — does not block the HTTP response.
+ */
+async function runVerification(submissionId: string, bountyId: string): Promise<void> {
+  try {
+    const [bounty, submission] = await Promise.all([
+      Bounty.findById(bountyId),
+      Submission.findById(submissionId),
+    ])
+    if (!bounty || !submission || submission.status !== 'pending') return
+
+    const result = await verificationService.verify(bounty.description, submission.text, submission.url ?? undefined)
+
+    submission.aiScore = result.score
+    submission.aiRationale = result.rationale
+    submission.status = result.decision === 'approved' ? 'approved' : 'rejected'
+    await submission.save()
+
+    // First-approved-wins: if approved and bounty still open, close it
+    if (result.decision === 'approved') {
+      const freshBounty = await Bounty.findById(bountyId)
+      if (freshBounty && freshBounty.status === 'open') {
+        freshBounty.status = 'won'
+        freshBounty.winnerSubmissionId = submissionId
+        await freshBounty.save()
+        // Close all other pending submissions for this bounty
+        await Submission.updateMany(
+          { bountyId, _id: { $ne: submissionId }, status: 'pending' },
+          { status: 'closed' }
+        )
+      }
+    }
+  } catch (err) {
+    console.error('[verification] Error processing submission:', submissionId, err)
+    // Mark as rejected on error to avoid permanently pending
+    await Submission.findByIdAndUpdate(submissionId, {
+      status: 'rejected',
+      aiRationale: 'Verification failed due to a system error. Please try again.',
+    }).catch(() => {})
+  }
+}
 
 /**
  * POST /api/bounties/:id/submissions
@@ -40,6 +84,9 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       status: 'pending',
     })
     await submission.save()
+
+    // Kick off async verification — don't await, respond immediately
+    setImmediate(() => runVerification(submission._id.toString(), String(bountyId)))
 
     return res.status(201).json({ success: true, data: submission })
   } catch (error) { next(error) }

@@ -5,6 +5,7 @@ import connectDB from './config/db'
 import { errorHandler } from './middleware/errorHandler'
 import bountiesRouter from './routes/bounties'
 import submissionsRouter, { solverSubmissionsRouter } from './routes/submissions'
+import verifyRouter from './routes/verify'
 
 // Load env vars — dotenv/config is loaded via ts-node-dev -r or npm scripts
 // When running directly: export NODE_ENV=development before running
@@ -38,6 +39,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/bounties', bountiesRouter)
 app.use('/api/bounties/:id/submissions', submissionsRouter)
 app.use('/api/submissions', solverSubmissionsRouter)
+app.use('/api/verify', verifyRouter)
 
 // ============================
 // Error handler (must be last middleware)

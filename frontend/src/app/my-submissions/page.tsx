@@ -11,9 +11,19 @@ const STATUS_COLORS: Record<string, string> = {
   closed: 'bg-white/5 text-text-muted border-white/10',
 }
 
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${STATUS_COLORS[status] ?? STATUS_COLORS.pending}`}>
+      {status === 'pending' && <span className="w-2 h-2 rounded-full border-2 border-current border-t-transparent animate-spin" />}
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  )
+}
+
 export default function MySubmissionsPage() {
   const { address, isConnected, connect } = useWallet()
   const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [expanded, setExpanded] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -25,6 +35,15 @@ export default function MySubmissionsPage() {
       .catch(() => setError('Failed to load submissions'))
       .finally(() => setIsLoading(false))
   }, [address])
+
+  // Poll pending submissions every 5s
+  useEffect(() => {
+    if (!address || submissions.every(s => s.status !== 'pending')) return
+    const interval = setInterval(() => {
+      fetchSolverSubmissions(address).then(r => setSubmissions(r.data)).catch(() => {})
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [address, submissions])
 
   if (!isConnected) return (
     <div className="max-w-7xl mx-auto px-6 py-20 text-center">
@@ -63,37 +82,53 @@ export default function MySubmissionsPage() {
       )}
 
       {!isLoading && submissions.length > 0 && (
-        <div className="glass-card overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border-glass">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider">Bounty</th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider hidden sm:table-cell">Submitted</th>
-                <th className="text-right px-5 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {submissions.map((s, i) => (
-                <tr key={s._id} className={`border-b border-border-glass last:border-0 hover:bg-white/[0.02] transition-colors ${i % 2 === 0 ? '' : 'bg-white/[0.01]'}`}>
-                  <td className="px-5 py-4">
-                    <Link href={`/bounty/${s.bountyId}`} className="text-text-primary text-sm font-medium hover:text-algo-teal transition-colors line-clamp-1">
-                      {s.bountyTitle ?? s.bountyId}
-                    </Link>
-                    {s.url && <p className="text-text-muted text-xs mt-0.5 truncate max-w-xs">{s.url}</p>}
-                  </td>
-                  <td className="px-5 py-4 hidden sm:table-cell">
-                    <span className="text-text-muted text-sm">{new Date(s.createdAt).toLocaleDateString()}</span>
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${STATUS_COLORS[s.status] ?? STATUS_COLORS.pending}`}>
-                      {s.status === 'pending' && <span className="w-2 h-2 rounded-full border-2 border-current border-t-transparent animate-spin" />}
-                      {s.status.charAt(0).toUpperCase() + s.status.slice(1)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-2">
+          {submissions.map(s => (
+            <div key={s._id} className="glass-card overflow-hidden">
+              <div
+                className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-white/[0.02] transition-colors"
+                onClick={() => setExpanded(expanded === s._id ? null : s._id)}
+              >
+                <div className="flex-1 min-w-0 mr-4">
+                  <Link href={`/bounty/${s.bountyId}`} onClick={e => e.stopPropagation()}
+                    className="text-text-primary text-sm font-medium hover:text-algo-teal transition-colors line-clamp-1 block">
+                    {s.bountyTitle ?? s.bountyId}
+                  </Link>
+                  <p className="text-text-muted text-xs mt-0.5">{new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <StatusBadge status={s.status} />
+                  {(s.aiRationale || s.status !== 'pending') && (
+                    <span className="text-text-muted text-xs">{expanded === s._id ? '▲' : '▼'}</span>
+                  )}
+                </div>
+              </div>
+
+              {expanded === s._id && (
+                <div className="px-5 pb-4 border-t border-border-glass">
+                  {s.aiRationale ? (
+                    <div className="pt-3">
+                      <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">AI Verdict</p>
+                      {s.aiScore !== null && s.aiScore !== undefined && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex-1 bg-white/5 rounded-full h-1.5">
+                            <div className="bg-algo-teal h-1.5 rounded-full transition-all" style={{ width: `${Math.round(s.aiScore * 100)}%` }} />
+                          </div>
+                          <span className="text-algo-teal text-xs font-mono">{Math.round(s.aiScore * 100)}%</span>
+                        </div>
+                      )}
+                      <p className="text-text-secondary text-sm leading-relaxed">{s.aiRationale}</p>
+                      {s.url && (
+                        <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-algo-teal text-xs hover:underline mt-2 inline-block">{s.url} ↗</a>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-text-muted text-sm pt-3">Waiting for AI verification…</p>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>
