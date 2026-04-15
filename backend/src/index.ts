@@ -3,6 +3,8 @@ import cors from 'cors'
 import path from 'path'
 import connectDB from './config/db'
 import { errorHandler } from './middleware/errorHandler'
+import bountiesRouter from './routes/bounties'
+import submissionsRouter, { solverSubmissionsRouter } from './routes/submissions'
 
 // Load env vars — dotenv/config is loaded via ts-node-dev -r or npm scripts
 // When running directly: export NODE_ENV=development before running
@@ -33,10 +35,9 @@ app.get('/health', (_req, res) => {
 // API Routes
 // ============================
 // Bounty creation + fetch — Phase 1 (Plan 4)
-// app.use('/api/bounties', bountiesRouter)
-//
-// Bounty board listing — Phase 2
-// Submission flow — Phase 3
+app.use('/api/bounties', bountiesRouter)
+app.use('/api/bounties/:id/submissions', submissionsRouter)
+app.use('/api/submissions', solverSubmissionsRouter)
 
 // ============================
 // Error handler (must be last middleware)

@@ -43,3 +43,34 @@ export async function createBounty(body: { title: string; description: string; c
   if (!res.ok) throw new Error(json.error ?? 'Failed to create bounty')
   return json
 }
+
+export interface Submission {
+  _id: string
+  bountyId: string
+  bountyTitle?: string
+  solverAddress: string
+  text: string
+  url?: string | null
+  status: 'pending' | 'approved' | 'rejected' | 'closed'
+  aiScore?: number | null
+  aiRationale?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export async function createSubmission(bountyId: string, body: { solverAddress: string; text: string; url?: string }): Promise<{ success: boolean; data: Submission }> {
+  const res = await fetch(`${API_URL}/api/bounties/${bountyId}/submissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json.error ?? 'Failed to submit')
+  return json
+}
+
+export async function fetchSolverSubmissions(solverAddress: string): Promise<{ success: boolean; data: Submission[] }> {
+  const res = await fetch(`${API_URL}/api/submissions?solverAddress=${encodeURIComponent(solverAddress)}`, { cache: 'no-store' })
+  if (!res.ok) throw new Error(`Failed to fetch submissions: ${res.status}`)
+  return res.json()
+}
