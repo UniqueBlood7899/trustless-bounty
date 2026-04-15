@@ -12,6 +12,8 @@ export interface Bounty {
   appId: number
   creationTxId: string
   status: 'open' | 'won' | 'expired' | 'refunded'
+  winnerSubmissionId?: string | null
+  payoutTxId?: string | null
   createdAt: string
   updatedAt: string
 }

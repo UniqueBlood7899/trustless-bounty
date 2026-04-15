@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorHandler'
 import bountiesRouter from './routes/bounties'
 import submissionsRouter, { solverSubmissionsRouter } from './routes/submissions'
 import verifyRouter from './routes/verify'
+import { startRefundCron } from './services/refundCron'
 
 // Load env vars — dotenv/config is loaded via ts-node-dev -r or npm scripts
 // When running directly: export NODE_ENV=development before running
@@ -51,6 +52,7 @@ app.use(errorHandler)
 // ============================
 const start = async (): Promise<void> => {
   await connectDB()
+  startRefundCron()
   app.listen(PORT, () => {
     console.log(`BountyChain backend running on port ${PORT}`)
     console.log(`Health: http://localhost:${PORT}/health`)

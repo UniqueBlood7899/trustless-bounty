@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import Bounty from '../models/Bounty'
 import Submission from '../models/Submission'
 import { verificationService } from '../services/verificationService'
+import { payoutBountyEscrow } from '../services/algorandService'
 
 const router = Router({ mergeParams: true })
 
@@ -24,7 +25,7 @@ async function runVerification(submissionId: string, bountyId: string): Promise<
     submission.status = result.decision === 'approved' ? 'approved' : 'rejected'
     await submission.save()
 
-    // First-approved-wins: if approved and bounty still open, close it
+    // First-approved-wins: if approved and bounty still open, close it and trigger payout
     if (result.decision === 'approved') {
       const freshBounty = await Bounty.findById(bountyId)
       if (freshBounty && freshBounty.status === 'open') {
@@ -36,6 +37,14 @@ async function runVerification(submissionId: string, bountyId: string): Promise<
           { bountyId, _id: { $ne: submissionId }, status: 'pending' },
           { status: 'closed' }
         )
+        // Trigger ALGO payout to winner
+        try {
+          const { txId } = await payoutBountyEscrow(freshBounty.appId, submission.solverAddress)
+          await Bounty.findByIdAndUpdate(bountyId, { payoutTxId: txId })
+          console.log(`[submissions] Payout tx: ${txId}`)
+        } catch (payoutErr) {
+          console.error('[submissions] Payout failed (funds safe in escrow):', payoutErr)
+        }
       }
     }
   } catch (err) {

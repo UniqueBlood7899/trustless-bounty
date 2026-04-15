@@ -26,6 +26,7 @@ export interface IBounty extends Document {
   /** MongoDB ID of the winning submission (set when status = 'won') */
   winnerSubmissionId?: string | null
   status: BountyStatus
+  payoutTxId?: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -51,6 +52,7 @@ const BountySchema = new Schema<IBounty>(
     appId: { type: Number, required: true, default: 0 },
     creationTxId: { type: String, required: true, default: '' },
     winnerSubmissionId: { type: String, default: null },
+    payoutTxId: { type: String, default: null },
     status: {
       type: String,
       enum: ['open', 'won', 'expired', 'refunded'],
