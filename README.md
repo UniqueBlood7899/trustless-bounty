@@ -7,7 +7,7 @@ BountyChain is a decentralized bounty platform that combines **Algorand smart co
 **The core loop:**
 1. Poster locks ALGO in a per-bounty smart contract escrow
 2. Solver submits a text solution (+ optional GitHub URL)
-3. Gemini 1.5 Flash semantically scores the solution against the task description
+3. Gemini Flash Models semantically scores the solution against the task description
 4. Score ≥ threshold → smart contract **automatically pays the winner**
 5. Deadline passes with no winner → contract **automatically refunds the poster**
 
@@ -30,7 +30,7 @@ Smart Contract App ID: `758868693` ([View on Lora](https://lora.algokit.io/testn
 | Feature | Description |
 |---------|-------------|
 | **Per-bounty escrow** | Each bounty deploys its own Algorand smart contract |
-| **AI verification** | Gemini 1.5 Flash scores solutions 0–1 against task description |
+| **AI verification** | Gemini Flash Models scores solutions 0–1 against task description |
 | **URL validation** | HTTP HEAD check on submitted links; unreachable = -0.2 score penalty |
 | **Instant payout** | Smart contract inner transaction fires automatically on approval |
 | **First-approved-wins** | First passing submission wins; all others auto-closed |
@@ -189,7 +189,7 @@ refund(): void                          // creator only, after deadline, returns
 
 ## 🤖 AI Verification
 
-The `VerificationService` uses **Gemini 1.5 Flash** to evaluate submissions:
+The `VerificationService` uses **Gemini Flash Models** to evaluate submissions:
 
 ```
 Score 0.0 – 1.0  →  threshold (default 0.6)  →  approved / rejected
@@ -271,7 +271,7 @@ npx tsc --noEmit
 |-------|------------|
 | Smart Contract | AlgoKit · PuyaTS · Algorand AVM |
 | Blockchain | Algorand TestNet |
-| AI Verification | Google Gemini 1.5 Flash |
+| AI Verification | Google Gemini Flash Models |
 | Backend | Express.js · TypeScript · MongoDB / Mongoose |
 | Frontend | Next.js 14 (App Router) · Tailwind CSS |
 | Wallet | Pera Wallet Connect (`@perawallet/connect`) |
