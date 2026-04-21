@@ -37,13 +37,17 @@ async function runVerification(submissionId: string, bountyId: string): Promise<
           { bountyId, _id: { $ne: submissionId }, status: 'pending' },
           { status: 'closed' }
         )
-        // Trigger ALGO payout to winner
-        try {
-          const { txId } = await payoutBountyEscrow(freshBounty.appId, submission.solverAddress)
-          await Bounty.findByIdAndUpdate(bountyId, { payoutTxId: txId })
-          console.log(`[submissions] Payout tx: ${txId}`)
-        } catch (payoutErr) {
-          console.error('[submissions] Payout failed (funds safe in escrow):', payoutErr)
+        // Trigger ALGO payout to winner (only if contract was actually deployed)
+        if (freshBounty.appId && freshBounty.appId !== 0) {
+          try {
+            const { txId } = await payoutBountyEscrow(freshBounty.appId, submission.solverAddress)
+            await Bounty.findByIdAndUpdate(bountyId, { payoutTxId: txId })
+            console.log(`[submissions] Payout tx: ${txId}`)
+          } catch (payoutErr) {
+            console.error('[submissions] Payout failed (funds safe in escrow):', payoutErr)
+          }
+        } else {
+          console.warn(`[submissions] Skipping payout — bounty ${bountyId} has no deployed contract (appId=0)`)
         }
       }
     }

@@ -31,7 +31,7 @@ export class VerificationService {
     if (!apiKey) throw new Error('GEMINI_API_KEY is not set')
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-flash-latest',
       systemInstruction: SYSTEM_PROMPT,
     })
 
