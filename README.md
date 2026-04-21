@@ -45,30 +45,30 @@ Smart Contract App ID: `758868693` ([View on Lora](https://lora.algokit.io/testn
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Frontend (Next.js 14)                  │
-│  Board · Bounty Detail · Create · My Bounties · My Subs  │
-│                   Pera Wallet Connect                     │
+│                    Frontend (Next.js 14)                │
+│  Board · Bounty Detail · Create · My Bounties · My Subs │
+│                   Pera Wallet Connect                   │
 └─────────────────────┬───────────────────────────────────┘
                       │ REST API
 ┌─────────────────────▼───────────────────────────────────┐
-│               Backend (Express + MongoDB)                 │
-│                                                           │
-│  POST /api/bounties     → deploy BountyEscrow contract   │
-│  POST /api/bounties/:id/submissions → save + verify      │
-│  GET  /api/submissions  → solver history                  │
-│  GET  /api/bounties/my  → poster dashboard               │
-│  POST /api/verify       → standalone verification         │
-│                                                           │
-│  VerificationService (Gemini Flash Model)                  │
-│  refundCron (node-cron, hourly)                          │
+│               Backend (Express + MongoDB)               │
+│                                                         │
+│  POST /api/bounties     → deploy BountyEscrow contract  │
+│  POST /api/bounties/:id/submissions → save + verify     │
+│  GET  /api/submissions  → solver history                │
+│  GET  /api/bounties/my  → poster dashboard              │
+│  POST /api/verify       → standalone verification       │
+│                                                         │
+│  VerificationService (Gemini Flash Model)               │
+│  refundCron (node-cron, hourly)                         │
 └──────┬──────────────────────────────────┬───────────────┘
        │ AlgoKit Utils                    │ Google AI SDK
-┌──────▼──────────┐              ┌────────▼──────────────┐
-│  Algorand       │              │  Gemini Flash Model    │
-│  TestNet        │              │  Semantic scoring      │
-│  BountyEscrow   │              │  0.0 – 1.0 score       │
-│  Smart Contract │              │  Configurable threshold│
-└─────────────────┘              └───────────────────────┘
+┌──────▼──────────┐              ┌────────▼────────────────┐
+│  Algorand       │              │  Gemini Flash Model     │
+│  TestNet        │              │  Semantic scoring       │
+│  BountyEscrow   │              │  0.0 – 1.0 score        │
+│  Smart Contract │              │  Configurable threshold │
+└─────────────────┘              └─────────────────────────┘
 ```
 
 ---
