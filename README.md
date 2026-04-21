@@ -277,5 +277,3 @@ npx tsc --noEmit
 | Wallet | Pera Wallet Connect (`@perawallet/connect`) |
 | Scheduler | node-cron |
 | Algorand SDK | `algosdk` · `@algorandfoundation/algokit-utils` |
-
----
